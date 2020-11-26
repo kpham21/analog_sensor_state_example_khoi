@@ -1,0 +1,92 @@
+// Define our states:
+const STATE_1 = 0
+const STATE_2 = 1
+const STATE_3 = 2
+
+// Set our sensor thresholds for each state
+const SENSOR_LEVEL_1 = 300
+const SENSOR_LEVEL_2 = 600
+
+// Set the pin we will use for our analog sensor
+const ANALOG_SENSOR_PIN = AnalogPin.P0
+
+// Set the pins for the outputs for each state
+const STATE_1_OUTPUT_PIN = DigitalPin.P1
+const STATE_2_OUTPUT_PIN = DigitalPin.P2
+const STATE_3_OUTPUT_PIN = DigitalPin.P3
+
+// Set initial values for the sensor reading and state.
+let analogSensorValue = 0
+let state = STATE_1
+
+//We need to turn off the LED display for the digital outputs to work properly.
+led.enable(false)
+
+basic.forever(function () {
+    //These are our three functions for the state system.
+    updateSystem(state)
+    state = evaluateState(state)
+    reactToState(state)
+
+    //We pause momentarily since we don't need to loop as quickly as the micro:bit can actually loop.
+    basic.pause(200)
+
+    //This will let you look at the analog value of the sensor to determine the thresholds for each state.
+    serial.writeLine(analogSensorValue.toString())
+})
+
+function updateSystem(state:number){
+    analogSensorValue = pins.analogReadPin(ANALOG_SENSOR_PIN)
+}
+
+function evaluateState(state:number){
+    // In this evaluate state structure, the state is determined by the sensor value and nothing else.
+    // This means the system can transition from one state to another.
+    if(analogSensorValue < SENSOR_LEVEL_1){
+        state = STATE_1
+    }
+    else if(analogSensorValue >= SENSOR_LEVEL_1 && analogSensorValue < SENSOR_LEVEL_2){
+        state = STATE_2
+    }
+    else if(analogSensorValue >= SENSOR_LEVEL_2){
+        state = STATE_3
+    }
+    return state
+}
+
+function reactToState(state:number){
+    switch(state){
+        case STATE_1:
+           //Turn on state 1 output for state 1
+            state_1_output()
+            break
+        case STATE_2:
+            //Turn on state 2 output for state 2
+            state_2_output()
+            
+            break
+        case STATE_3:
+            //Turn on state 3 output for state 3
+            state_3_output()
+            break
+    }
+}
+
+function state_1_output(){
+    pins.digitalWritePin(STATE_1_OUTPUT_PIN, 1)
+    pins.digitalWritePin(STATE_2_OUTPUT_PIN, 0)
+    pins.digitalWritePin(STATE_3_OUTPUT_PIN, 0)
+
+}
+
+function state_2_output(){
+
+
+    
+}
+
+function state_3_output(){
+
+
+    
+}
